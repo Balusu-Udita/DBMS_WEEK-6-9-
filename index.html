@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DBMS Lab (6-9)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: DevFocus (Slate grey, off-white, and muted teal) -->
+    <!-- Application Structure Plan: A two-column SPA with a fixed sidebar for lab session navigation and a dynamic main content area. This structure provides clear, persistent navigation, allowing users to easily switch between topics. The content area uses searchable and filterable cards for each question/code pair to facilitate quick lookups and easy reading, which is more user-friendly than a linear document. A 'copy code' feature is added for practical utility. -->
+    <!-- Visualization & Content Choices: The source report is code-based, so no charts are used. The primary goal is clear presentation and utility. Info: Lab Questions/Answers -> Goal: Inform/Provide Solution -> Presentation: HTML card with formatted code block -> Interaction: Click-to-copy button for code snippets -> Justification: Provides direct utility for a developer/student audience. Method: HTML/Tailwind/JS. Info: Lab Sections -> Goal: Organize -> Presentation: Sidebar Navigation Links -> Interaction: Click to filter content -> Justification: Intuitive navigation for a multi-part document. Method: JS content rendering. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        pre, code {
+            font-family: 'Roboto Mono', monospace;
+        }
+        .sidebar-link {
+            transition: all 0.2s ease-in-out;
+        }
+        .sidebar-link:hover, .sidebar-link.active {
+            background-color: #4A5568; /* a shade of gray-700 */
+            color: #FFFFFF;
+            transform: translateX(4px);
+        }
+        .card {
+            transition: all 0.3s ease-in-out;
+            overflow: hidden;
+        }
+        .copy-btn-feedback {
+            transition: background-color 0.3s ease;
+        }
+    </style>
+</head>
+<body class="bg-slate-100 text-slate-800">
+    <div class="flex h-screen">
+        <aside class="w-64 bg-slate-800 text-slate-100 p-4 flex-shrink-0">
+            <h1 class="text-2xl font-bold mb-6 border-b border-slate-600 pb-4">DBMS Lab Manual</h1>
+            <nav id="sidebar-nav">
+                <!-- Navigation links will be populated by JS -->
+            </nav>
+        </aside>
+
+        <main class="flex-1 p-6 lg:p-8 overflow-y-auto">
+            <div class="max-w-4xl mx-auto">
+                <header class="mb-8">
+                    <h2 id="main-title" class="text-3xl font-bold text-slate-900"></h2>
+                    <p id="main-intro" class="mt-2 text-slate-600"></p>
+                    <div class="mt-6 relative">
+                        <input type="text" id="search-box" placeholder="Search questions..." class="w-full p-3 pl-10 rounded-lg border border-slate-300 focus:ring-2 focus:ring-teal-500 focus:outline-none">
+                        <svg class="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                    </div>
+                </header>
+                <div id="content-area">
+                    <!-- Content will be populated by JS -->
+                </div>
+                 <div id="no-results" class="text-center py-10 text-slate-500 hidden">
+                    <h3 class="text-xl font-semibold">No Results Found</h3>
+                    <p>Try adjusting your search terms.</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const dbmsLabData = [
+            {
+                id: 'lab6',
+                title: 'Lab Session 06: PL/SQL Control Structures',
+                intro: 'This section covers fundamental PL/SQL control structures. You will find examples for conditional logic using IF/ELSE, various loop types for iteration, and basic data manipulation within PL/SQL blocks.',
+                sections: {
+                    inLab: {
+                        title: 'In Lab',
+                        questions: [
+                            {
+                                question: "Write a PL/SQL block to find the largest of two numbers using if....else.",
+                                code: `DECLARE
+    num1 NUMBER := 25;
+    num2 NUMBER := 50;
+BEGIN
+    IF num1 > num2 THEN
+        DBMS_OUTPUT.PUT_LINE('The largest number is: ' || num1);
+    ELSE
+        DBMS_OUTPUT.PUT_LINE('The largest number is: ' || num2);
+    END IF;
+END;
+/`
+                            },
+                            {
+                                question: "Write a PL/SQL block to calculate sum, product, square root and cube root of a given input.",
+                                code: `DECLARE
+    n NUMBER := 16;
+    sum_val NUMBER;
+    prod_val NUMBER;
+    sqrt_val NUMBER;
+    cbrt_val NUMBER;
+BEGIN
+    sum_val := n + 10;
+    prod_val := n * 10;
+    sqrt_val := SQRT(n);
+    cbrt_val := POWER(n, 1/3);
+
+    DBMS_OUTPUT.PUT_LINE('Number: ' || n);
+    DBMS_OUTPUT.PUT_LINE('Sum with 10: ' || sum_val);
+    DBMS_OUTPUT.PUT_LINE('Product with 10: ' || prod_val);
+    DBMS_OUTPUT.PUT_LINE('Square Root: ' || sqrt_val);
+    DBMS_OUTPUT.PUT_LINE('Cube Root: ' || cbrt_val);
+END;
+/`
+                            },
+                            {
+                                question: "Write a PL/SQL block to print odd numbers from 1...30 using basic loop.",
+                                code: `DECLARE
+    i NUMBER := 1;
+BEGIN
+    LOOP
+        EXIT WHEN i > 30;
+        IF MOD(i, 2) != 0 THEN
+            DBMS_OUTPUT.PUT_LINE(i);
+        END IF;
+        i := i + 1;
+    END LOOP;
+END;
+/`
+                            },
+                            {
+                                question: "Write a PL/SQL program to fetch salary from EMPLOYEE table where Empno is 7782.",
+                                code: `DECLARE
+    v_salary EMPLOYEE.SAL%TYPE;
+BEGIN
+    SELECT SAL INTO v_salary
+    FROM EMPLOYEE
+    WHERE EMPNO = 7782;
+
+    DBMS_OUTPUT.PUT_LINE('The salary of employee 7782 is: ' || v_salary);
+EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+        DBMS_OUTPUT.PUT_LINE('Employee with Empno 7782 not found.');
+END;
+/`
+                            }
+                        ]
+                    },
+                    postLab: {
+                        title: 'Post Lab',
+                        questions: [
+                            {
+                                question: "Write a PL/SQL block to find the given number is palindrome or not using while loop.",
+                                code: `DECLARE
+    n NUMBER := 121;
+    temp NUMBER;
+    rev NUMBER := 0;
+    rem NUMBER;
+BEGIN
+    temp := n;
+    WHILE temp > 0
+    LOOP
+        rem := MOD(temp, 10);
+        rev := (rev * 10) + rem;
+        temp := TRUNC(temp / 10);
+    END LOOP;
+
+    IF n = rev THEN
+        DBMS_OUTPUT.PUT_LINE(n || ' is a palindrome.');
+    ELSE
+        DBMS_OUTPUT.PUT_LINE(n || ' is not a palindrome.');
+    END IF;
+END;
+/`
+                            },
+                            {
+                                question: "Write a PL/SQL block to print 1...10 in reverse order using for loop.",
+                                code: `BEGIN
+    FOR i IN REVERSE 1..10 LOOP
+        DBMS_OUTPUT.PUT_LINE(i);
+    END LOOP;
+END;
+/`
+                            },
+                            {
+                                question: "Write a PL/SQL program to update a Record in the DEPARTMENT table.",
+                                code: `DECLARE
+    v_deptno DEPARTMENT.DEPTNO%TYPE := 10;
+    v_new_loc DEPARTMENT.LOC%TYPE := 'VIJAYAWADA';
+BEGIN
+    UPDATE DEPARTMENT
+    SET LOC = v_new_loc
+    WHERE DEPTNO = v_deptno;
+
+    IF SQL%FOUND THEN
+        DBMS_OUTPUT.PUT_LINE('Department ' || v_deptno || '''s location updated to ' || v_new_loc);
+    ELSE
+        DBMS_OUTPUT.PUT_LINE('Department ' || v_deptno || ' not found.');
+    END IF;
+    COMMIT;
+END;
+/`
+                            }
+                        ]
+                    }
+                }
+            },
+            {
+                id: 'lab7',
+                title: 'Lab Session 07: PL/SQL Cursors and Exceptions',
+                intro: 'Explore cursors for handling multi-row query results and exceptions for robust error handling. This section demonstrates explicit cursors with their attributes (%FOUND, %NOTFOUND, %ROWCOUNT) and handling predefined exceptions like NO_DATA_FOUND.',
+                sections: {
+                    inLab: {
+                        title: 'In Lab',
+                        questions: [
+                            {
+                                question: "Write a PL/SQL program to fetch employee name, salary from EMPLOYEE table for the given input. Raise an exception when no data found.",
+                                code: `DECLARE
+    v_empno EMPLOYEE.EMPNO%TYPE := &emp_no;
+    v_ename EMPLOYEE.ENAME%TYPE;
+    v_sal   EMPLOYEE.SAL%TYPE;
+BEGIN
+    SELECT ENAME, SAL INTO v_ename, v_sal
+    FROM EMPLOYEE
+    WHERE EMPNO = v_empno;
+
+    DBMS_OUTPUT.PUT_LINE('Employee Name: ' || v_ename);
+    DBMS_OUTPUT.PUT_LINE('Salary: ' || v_sal);
+EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+        DBMS_OUTPUT.PUT_LINE('No employee found with EMPNO: ' || v_empno);
+END;
+/`
+                            },
+                            {
+                                question: "Write a PL/SQL program to fetch all the data from a DEPARTMENT table and display it on the screen using %notfound attribute.",
+                                code: `DECLARE
+    CURSOR dept_cursor IS SELECT * FROM DEPARTMENT;
+    dept_rec dept_cursor%ROWTYPE;
+BEGIN
+    OPEN dept_cursor;
+    LOOP
+        FETCH dept_cursor INTO dept_rec;
+        EXIT WHEN dept_cursor%NOTFOUND;
+        DBMS_OUTPUT.PUT_LINE('Dept No: ' || dept_rec.DEPTNO || ', Name: ' || dept_rec.DNAME || ', Location: ' || dept_rec.LOC);
+    END LOOP;
+    CLOSE dept_cursor;
+END;
+/`
+                            },
+                            {
+                                question: "Write a PL/SQL program to display deptno, empno, ename from EMP table using %found attribute.",
+                                code: `DECLARE
+    CURSOR emp_cursor IS SELECT DEPTNO, EMPNO, ENAME FROM EMPLOYEE;
+    v_deptno EMPLOYEE.DEPTNO%TYPE;
+    v_empno  EMPLOYEE.EMPNO%TYPE;
+    v_ename  EMPLOYEE.ENAME%TYPE;
+BEGIN
+    OPEN emp_cursor;
+    FETCH emp_cursor INTO v_deptno, v_empno, v_ename;
+    IF emp_cursor%FOUND THEN
+      DBMS_OUTPUT.PUT_LINE('Dept No | Emp No | Ename');
+      DBMS_OUTPUT.PUT_LINE('-----------------------');
+      WHILE emp_cursor%FOUND LOOP
+        DBMS_OUTPUT.PUT_LINE(v_deptno || ' | ' || v_empno || ' | ' || v_ename);
+        FETCH emp_cursor INTO v_deptno, v_empno, v_ename;
+      END LOOP;
+    ELSE
+      DBMS_OUTPUT.PUT_LINE('No records found in the employee table.');
+    END IF;
+    CLOSE emp_cursor;
+END;
+/`
+                            },
+                            {
+                                question: "Write a PL/SQL program to find the number of records of EMP Table using %rowcount.",
+                                code: `DECLARE
+    CURSOR emp_cursor IS SELECT ENAME FROM EMPLOYEE;
+    v_ename EMPLOYEE.ENAME%TYPE;
+BEGIN
+    OPEN emp_cursor;
+    LOOP
+        FETCH emp_cursor INTO v_ename;
+        EXIT WHEN emp_cursor%NOTFOUND;
+    END LOOP;
+    DBMS_OUTPUT.PUT_LINE('Total number of employees: ' || emp_cursor%ROWCOUNT);
+    CLOSE emp_cursor;
+END;
+/`
+                            }
+                        ]
+                    },
+                    postLab: {
+                        title: 'Post Lab',
+                        questions: [
+                            {
+                                question: "Write a PL/SQL program to list the department numbers, Total salary, Maximum salary, Average salary and the number of employees in each Department. If the employee does not exist then display the message ‘Employee doesn’t exist’.",
+                                code: `DECLARE
+    CURSOR dept_stats_cursor IS
+        SELECT
+            d.DEPTNO,
+            NVL(SUM(e.SAL), 0) AS TOTAL_SALARY,
+            NVL(MAX(e.SAL), 0) AS MAX_SALARY,
+            NVL(AVG(e.SAL), 0) AS AVG_SALARY,
+            COUNT(e.EMPNO) AS NUM_EMPLOYEES
+        FROM DEPARTMENT d
+        LEFT JOIN EMPLOYEE e ON d.DEPTNO = e.DEPTNO
+        GROUP BY d.DEPTNO
+        ORDER BY d.DEPTNO;
+    v_record_found BOOLEAN := FALSE;
+BEGIN
+    DBMS_OUTPUT.PUT_LINE('DeptNo | Total Salary | Max Salary | Avg Salary | Num Employees');
+    DBMS_OUTPUT.PUT_LINE('-----------------------------------------------------------------');
+    FOR rec IN dept_stats_cursor LOOP
+        v_record_found := TRUE;
+        DBMS_OUTPUT.PUT_LINE(
+            RPAD(rec.DEPTNO, 7) || ' | ' ||
+            RPAD(TO_CHAR(rec.TOTAL_SALARY, '999,999'), 13) || ' | ' ||
+            RPAD(TO_CHAR(rec.MAX_SALARY, '99,999'), 11) || ' | ' ||
+            RPAD(TO_CHAR(rec.AVG_SALARY, '99,999.99'), 11) || ' | ' ||
+            rec.NUM_EMPLOYEES
+        );
+    END LOOP;
+
+    IF NOT v_record_found THEN
+        DBMS_OUTPUT.PUT_LINE('Employee doesn''t exist.');
+    END IF;
+END;
+/`
+                            },
+                            {
+                                question: 'Write a PL/SQL program to check whether the cursor is opened or not. If the cursor is opened display "Cursor already opened" otherwise open the cursor and Display the message "Just Opened the Cursor".',
+                                code: `DECLARE
+    CURSOR emp_cursor IS SELECT ENAME FROM EMPLOYEE WHERE DEPTNO = 10;
+BEGIN
+    IF emp_cursor%ISOPEN THEN
+        DBMS_OUTPUT.PUT_LINE('Cursor already opened');
+    ELSE
+        OPEN emp_cursor;
+        DBMS_OUTPUT.PUT_LINE('Just Opened the Cursor');
+    END IF;
+
+    IF emp_cursor%ISOPEN THEN
+        CLOSE emp_cursor;
+    END IF;
+END;
+/`
+                            }
+                        ]
+                    }
+                }
+            },
+            {
+                id: 'lab8',
+                title: 'Lab Session 08: PL/SQL Named Blocks',
+                intro: 'Learn to create reusable code modules with named blocks: Procedures and Functions. This section covers creating stored procedures with IN/OUT parameters and functions that return values, promoting modular and maintainable code.',
+                sections: {
+                    inLab: {
+                        title: 'In Lab',
+                        questions: [
+                            {
+                                question: "Write a PL/SQL block to compute the factorial of a given number using stored procedure.",
+                                code: `CREATE OR REPLACE PROCEDURE find_factorial (
+    p_num IN NUMBER,
+    p_fact OUT NUMBER
+)
+IS
+BEGIN
+    IF p_num < 0 THEN
+        p_fact := NULL;
+    ELSIF p_num = 0 THEN
+        p_fact := 1;
+    ELSE
+        p_fact := 1;
+        FOR i IN 1..p_num LOOP
+            p_fact := p_fact * i;
+        END LOOP;
+    END IF;
+END;
+/
+
+-- Block to execute the procedure
+DECLARE
+    n NUMBER := 5;
+    factorial NUMBER;
+BEGIN
+    find_factorial(n, factorial);
+    IF factorial IS NULL THEN
+        DBMS_OUTPUT.PUT_LINE('Factorial is not defined for negative numbers.');
+    ELSE
+        DBMS_OUTPUT.PUT_LINE('Factorial of ' || n || ' is ' || factorial);
+    END IF;
+END;
+/`
+                            },
+                            {
+                                question: "Write a PL/SQL Procedure to display Ename, Salary when user inputs Empno Using in/out parameters.",
+                                code: `CREATE OR REPLACE PROCEDURE get_emp_details (
+    p_empno IN  EMPLOYEE.EMPNO%TYPE,
+    p_ename OUT EMPLOYEE.ENAME%TYPE,
+    p_sal   OUT EMPLOYEE.SAL%TYPE
+)
+IS
+BEGIN
+    SELECT ENAME, SAL INTO p_ename, p_sal
+    FROM EMPLOYEE
+    WHERE EMPNO = p_empno;
+EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+        p_ename := NULL;
+        p_sal   := NULL;
+END;
+/
+
+-- Block to execute the procedure
+DECLARE
+    v_empno EMPLOYEE.EMPNO%TYPE := 7839;
+    v_ename EMPLOYEE.ENAME%TYPE;
+    v_sal   EMPLOYEE.SAL%TYPE;
+BEGIN
+    get_emp_details(v_empno, v_ename, v_sal);
+    IF v_ename IS NOT NULL THEN
+        DBMS_OUTPUT.PUT_LINE('Employee Name: ' || v_ename);
+        DBMS_OUTPUT.PUT_LINE('Salary: ' || v_sal);
+    ELSE
+        DBMS_OUTPUT.PUT_LINE('Employee with number ' || v_empno || ' not found.');
+    END IF;
+END;
+/`
+                            },
+                            {
+                                question: "Write a PL/SQL Function to check the validity of Empno from the EMP table.",
+                                code: `CREATE OR REPLACE FUNCTION is_emp_valid (
+    p_empno IN EMPLOYEE.EMPNO%TYPE
+) RETURN BOOLEAN
+IS
+    v_count NUMBER;
+BEGIN
+    SELECT COUNT(*) INTO v_count
+    FROM EMPLOYEE
+    WHERE EMPNO = p_empno;
+
+    RETURN (v_count > 0);
+END;
+/
+
+-- Block to execute the function
+DECLARE
+    v_empno EMPLOYEE.EMPNO%TYPE := 7499;
+BEGIN
+    IF is_emp_valid(v_empno) THEN
+        DBMS_OUTPUT.PUT_LINE('Employee ' || v_empno || ' is valid.');
+    ELSE
+        DBMS_OUTPUT.PUT_LINE('Employee ' || v_empno || ' is invalid.');
+    END IF;
+END;
+/`
+                            }
+                        ]
+                    },
+                    postLab: {
+                        title: 'Post Lab',
+                        questions: [
+                            {
+                                question: "Write a PL/SQL Procedure to update Salary of EMP table using Empno as in parameter.",
+                                code: `CREATE OR REPLACE PROCEDURE update_emp_salary (
+    p_empno IN EMPLOYEE.EMPNO%TYPE,
+    p_new_sal IN EMPLOYEE.SAL%TYPE
+)
+IS
+BEGIN
+    UPDATE EMPLOYEE
+    SET SAL = p_new_sal
+    WHERE EMPNO = p_empno;
+
+    IF SQL%ROWCOUNT = 0 THEN
+        DBMS_OUTPUT.PUT_LINE('Employee ' || p_empno || ' not found.');
+    ELSE
+        DBMS_OUTPUT.PUT_LINE('Salary updated for employee ' || p_empno);
+        COMMIT;
+    END IF;
+EXCEPTION
+    WHEN OTHERS THEN
+        DBMS_OUTPUT.PUT_LINE('Error updating salary: ' || SQLERRM);
+        ROLLBACK;
+END;
+/
+
+-- Block to execute the procedure
+BEGIN
+    update_emp_salary(7369, 20000);
+END;
+/`
+                            },
+                            {
+                                question: "Write PL/SQL Function that returns Deptno when user inputs Dname.",
+                                code: `CREATE OR REPLACE FUNCTION get_deptno_by_dname (
+    p_dname IN DEPARTMENT.DNAME%TYPE
+) RETURN DEPARTMENT.DEPTNO%TYPE
+IS
+    v_deptno DEPARTMENT.DEPTNO%TYPE;
+BEGIN
+    SELECT DEPTNO INTO v_deptno
+    FROM DEPARTMENT
+    WHERE DNAME = UPPER(p_dname);
+
+    RETURN v_deptno;
+EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+        RETURN NULL;
+END;
+/
+
+-- Block to execute the function
+DECLARE
+    v_dept_name DEPARTMENT.DNAME%TYPE := 'SALES';
+    v_dept_number DEPARTMENT.DEPTNO%TYPE;
+BEGIN
+    v_dept_number := get_deptno_by_dname(v_dept_name);
+    IF v_dept_number IS NOT NULL THEN
+        DBMS_OUTPUT.PUT_LINE('The department number for ' || v_dept_name || ' is ' || v_dept_number);
+    ELSE
+        DBMS_OUTPUT.PUT_LINE('Department named ' || v_dept_name || ' not found.');
+    END IF;
+END;
+/`
+                            }
+                        ]
+                    }
+                }
+            },
+            {
+                id: 'lab9',
+                title: 'Lab Session 09: PL/SQL Packages & Triggers',
+                intro: 'Master advanced PL/SQL concepts: Packages for grouping related procedures and functions, and Triggers for automating actions based on database events. These examples show how to build modular libraries with packages and enforce business rules with triggers.',
+                sections: {
+                    inLab: {
+                        title: 'In Lab',
+                        questions: [
+                            {
+                                question: "Create a Package Math_lib with the functions add(), sub(), mul(), and div(). Accepts two numbers and return the result.",
+                                code: `-- Package Specification
+CREATE OR REPLACE PACKAGE Math_lib AS
+    FUNCTION add(a NUMBER, b NUMBER) RETURN NUMBER;
+    FUNCTION sub(a NUMBER, b NUMBER) RETURN NUMBER;
+    FUNCTION mul(a NUMBER, b NUMBER) RETURN NUMBER;
+    FUNCTION div(a NUMBER, b NUMBER) RETURN NUMBER;
+END Math_lib;
+/
+
+-- Package Body
+CREATE OR REPLACE PACKAGE BODY Math_lib AS
+    FUNCTION add(a NUMBER, b NUMBER) RETURN NUMBER IS
+    BEGIN
+        RETURN a + b;
+    END add;
+
+    FUNCTION sub(a NUMBER, b NUMBER) RETURN NUMBER IS
+    BEGIN
+        RETURN a - b;
+    END sub;
+
+    FUNCTION mul(a NUMBER, b NUMBER) RETURN NUMBER IS
+    BEGIN
+        RETURN a * b;
+    END mul;
+
+    FUNCTION div(a NUMBER, b NUMBER) RETURN NUMBER IS
+    BEGIN
+        IF b = 0 THEN
+            RETURN NULL; -- Cannot divide by zero
+        ELSE
+            RETURN a / b;
+        END IF;
+    END div;
+END Math_lib;
+/
+
+-- Block to use the package
+DECLARE
+    x NUMBER := 20;
+    y NUMBER := 10;
+BEGIN
+    DBMS_OUTPUT.PUT_LINE(x || ' + ' || y || ' = ' || Math_lib.add(x, y));
+    DBMS_OUTPUT.PUT_LINE(x || ' - ' || y || ' = ' || Math_lib.sub(x, y));
+    DBMS_OUTPUT.PUT_LINE(x || ' * ' || y || ' = ' || Math_lib.mul(x, y));
+    DBMS_OUTPUT.PUT_LINE(x || ' / ' || y || ' = ' || Math_lib.div(x, y));
+END;
+/`
+                            },
+                            {
+                                question: "Write a Trigger that is fired before the DML statement's execution on the EMP Table. The trigger checks the day based on SYSDATE. If the day is Sunday, trigger does not allow the DML statement's execution and raises an exception.",
+                                code: `CREATE OR REPLACE TRIGGER restrict_emp_dml_on_sunday
+BEFORE INSERT OR UPDATE OR DELETE ON EMPLOYEE
+BEGIN
+    IF TO_CHAR(SYSDATE, 'DY', 'NLS_DATE_LANGUAGE=AMERICAN') = 'SUN' THEN
+        RAISE_APPLICATION_ERROR(-20001, 'DML operations on the EMPLOYEE table are not allowed on Sunday.');
+    END IF;
+END;
+/`
+                            }
+                        ]
+                    },
+                    postLab: {
+                        title: 'Post Lab',
+                        questions: [
+                            {
+                                question: "Create a package to perform insert and delete operations on EMP table.",
+                                code: `-- Package Specification
+CREATE OR REPLACE PACKAGE emp_manager AS
+    PROCEDURE add_employee(
+        p_empno   IN EMPLOYEE.EMPNO%TYPE,
+        p_ename   IN EMPLOYEE.ENAME%TYPE,
+        p_job     IN EMPLOYEE.JOB%TYPE,
+        p_mgr     IN EMPLOYEE.MGR%TYPE,
+        p_hiredate IN EMPLOYEE.HIREDATE%TYPE,
+        p_sal     IN EMPLOYEE.SAL%TYPE,
+        p_comm    IN EMPLOYEE.COMM%TYPE,
+        p_deptno  IN EMPLOYEE.DEPTNO%TYPE
+    );
+    PROCEDURE remove_employee(p_empno IN EMPLOYEE.EMPNO%TYPE);
+END emp_manager;
+/
+
+-- Package Body
+CREATE OR REPLACE PACKAGE BODY emp_manager AS
+    PROCEDURE add_employee(
+        p_empno   IN EMPLOYEE.EMPNO%TYPE,
+        p_ename   IN EMPLOYEE.ENAME%TYPE,
+        p_job     IN EMPLOYEE.JOB%TYPE,
+        p_mgr     IN EMPLOYEE.MGR%TYPE,
+        p_hiredate IN EMPLOYEE.HIREDATE%TYPE,
+        p_sal     IN EMPLOYEE.SAL%TYPE,
+        p_comm    IN EMPLOYEE.COMM%TYPE,
+        p_deptno  IN EMPLOYEE.DEPTNO%TYPE
+    ) IS
+    BEGIN
+        INSERT INTO EMPLOYEE (EMPNO, ENAME, JOB, MGR, HIREDATE, SAL, COMM, DEPTNO)
+        VALUES (p_empno, p_ename, p_job, p_mgr, p_hiredate, p_sal, p_comm, p_deptno);
+        COMMIT;
+    END add_employee;
+
+    PROCEDURE remove_employee(p_empno IN EMPLOYEE.EMPNO%TYPE) IS
+    BEGIN
+        DELETE FROM EMPLOYEE WHERE EMPNO = p_empno;
+        COMMIT;
+    END remove_employee;
+END emp_manager;
+/`
+                            },
+                            {
+                                question: "Write a Trigger that is fired after an INSERT statement is executed For the DEPT Table. The trigger writes the new department's Id and System date in a table called TRACKING.",
+                                code: `-- First, create the TRACKING table
+CREATE TABLE TRACKING (
+    DEPT_ID NUMBER(4),
+    ACTION_DATE DATE
+);
+
+-- Now, create the trigger
+CREATE OR REPLACE TRIGGER track_dept_inserts
+AFTER INSERT ON DEPARTMENT
+FOR EACH ROW
+BEGIN
+    INSERT INTO TRACKING (DEPT_ID, ACTION_DATE)
+    VALUES (:NEW.DEPTNO, SYSDATE);
+END;
+/`
+                            }
+                        ]
+                    }
+                }
+            }
+        ];
+
+        const sidebarNav = document.getElementById('sidebar-nav');
+        const mainTitle = document.getElementById('main-title');
+        const mainIntro = document.getElementById('main-intro');
+        const contentArea = document.getElementById('content-area');
+        const searchBox = document.getElementById('search-box');
+        const noResults = document.getElementById('no-results');
+
+        function createQuestionCard(q) {
+            const card = document.createElement('div');
+            card.className = 'card bg-white rounded-lg shadow-md mb-6 border border-slate-200';
+            card.setAttribute('data-search-content', (q.question + q.code).toLowerCase());
+
+            const questionHeader = document.createElement('h4');
+            questionHeader.className = 'font-semibold text-lg p-4 border-b border-slate-200';
+            questionHeader.textContent = q.question;
+            card.appendChild(questionHeader);
+            
+            const codeWrapper = document.createElement('div');
+            codeWrapper.className = 'p-4 bg-slate-50 relative';
+            
+            const pre = document.createElement('pre');
+            pre.className = 'text-sm text-slate-700 overflow-x-auto';
+            const code = document.createElement('code');
+            code.textContent = q.code;
+            pre.appendChild(code);
+            codeWrapper.appendChild(pre);
+
+            const copyBtn = document.createElement('button');
+            copyBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg> <span>Copy</span>`;
+            copyBtn.className = 'copy-btn-feedback absolute top-2 right-2 bg-slate-200 hover:bg-teal-500 hover:text-white text-slate-600 text-xs font-semibold py-1 px-2 rounded-md flex items-center gap-1';
+            
+            copyBtn.onclick = () => {
+                const textToCopy = q.code;
+                
+                const tempTextArea = document.createElement('textarea');
+                tempTextArea.value = textToCopy;
+                document.body.appendChild(tempTextArea);
+                tempTextArea.select();
+                try {
+                    document.execCommand('copy');
+                    copyBtn.innerHTML = `<span>Copied!</span>`;
+                    copyBtn.classList.remove('bg-slate-200', 'hover:bg-teal-500', 'text-slate-600');
+                    copyBtn.classList.add('bg-green-500', 'text-white');
+
+                    setTimeout(() => {
+                        copyBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg> <span>Copy</span>`;
+                        copyBtn.classList.remove('bg-green-500', 'text-white');
+                        copyBtn.classList.add('bg-slate-200', 'hover:bg-teal-500', 'text-slate-600');
+                    }, 2000);
+                } catch (err) {
+                    console.error('Failed to copy text: ', err);
+                }
+                document.body.removeChild(tempTextArea);
+            };
+
+            codeWrapper.appendChild(copyBtn);
+            card.appendChild(codeWrapper);
+            return card;
+        }
+
+        function renderSession(session) {
+            mainTitle.textContent = session.title;
+            mainIntro.textContent = session.intro;
+            contentArea.innerHTML = '';
+
+            Object.values(session.sections).forEach(section => {
+                const sectionWrapper = document.createElement('div');
+                sectionWrapper.className = 'mb-8';
+
+                const sectionTitle = document.createElement('h3');
+                sectionTitle.className = 'text-2xl font-bold mb-4 pb-2 border-b-2 border-teal-500';
+                sectionTitle.textContent = section.title;
+                sectionWrapper.appendChild(sectionTitle);
+                
+                section.questions.forEach(q => {
+                    sectionWrapper.appendChild(createQuestionCard(q));
+                });
+
+                contentArea.appendChild(sectionWrapper);
+            });
+        }
+
+        function setActiveLink(labId) {
+            document.querySelectorAll('.sidebar-link').forEach(link => {
+                link.classList.remove('active');
+                if (link.dataset.labid === labId) {
+                    link.classList.add('active');
+                }
+            });
+        }
+        
+        function handleSearch() {
+            const searchTerm = searchBox.value.toLowerCase();
+            const allCards = document.querySelectorAll('.card');
+            let visibleCount = 0;
+            
+            allCards.forEach(card => {
+                const content = card.dataset.searchContent;
+                if (content.includes(searchTerm)) {
+                    card.style.display = 'block';
+                    visibleCount++;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+
+            if (visibleCount === 0) {
+                noResults.classList.remove('hidden');
+            } else {
+                noResults.classList.add('hidden');
+            }
+        }
+
+        function init() {
+            dbmsLabData.forEach(lab => {
+                const link = document.createElement('a');
+                link.href = `#${lab.id}`;
+                link.textContent = lab.title.split(':')[0]; // e.g., "Lab Session 06"
+                link.className = 'block py-2 px-4 rounded-md sidebar-link';
+                link.dataset.labid = lab.id;
+
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    renderSession(lab);
+                    setActiveLink(lab.id);
+                    history.pushState(null, '', `#${lab.id}`);
+                });
+
+                sidebarNav.appendChild(link);
+            });
+
+            const initialLabId = window.location.hash.substring(1) || dbmsLabData[0].id;
+            const initialLab = dbmsLabData.find(lab => lab.id === initialLabId) || dbmsLabData[0];
+            
+            renderSession(initialLab);
+            setActiveLink(initialLab.id);
+
+            searchBox.addEventListener('keyup', handleSearch);
+        }
+
+        window.addEventListener('popstate', () => {
+            const labId = window.location.hash.substring(1) || dbmsLabData[0].id;
+            const labData = dbmsLabData.find(lab => lab.id === labId) || dbmsLabData[0];
+            renderSession(labData);
+            setActiveLink(labId);
+        });
+
+        init();
+    </script>
+</body>
+</html>
